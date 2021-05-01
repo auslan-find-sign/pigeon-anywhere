@@ -1,0 +1,32 @@
+{
+  "name": "pigeon-anywhere",
+  "version": "1.0.0",
+  "description": "Auslan Anywhere bot to sync Auslan Anywhere feeds in to Pigeon Optics",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --exit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/auslan-find-sign/pigeon-anywhere.git"
+  },
+  "keywords": [
+    "spider",
+    "bot",
+    "scraper",
+    "auslan"
+  ],
+  "author": "Phoenix Fox",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/auslan-find-sign/pigeon-anywhere/issues"
+  },
+  "homepage": "https://github.com/auslan-find-sign/pigeon-anywhere#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "graphql-request": "^3.4.0",
+    "uri-tag": "^1.3.0",
+    "yaml": "^1.10.2",
+    "yargs": "^16.2.0"
+  }
+}
