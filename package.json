@@ -25,6 +25,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "graphql-request": "^3.4.0",
+    "node-fetch": "^2.6.1",
     "uri-tag": "^1.3.0",
     "yaml": "^1.10.2",
     "yargs": "^16.2.0"

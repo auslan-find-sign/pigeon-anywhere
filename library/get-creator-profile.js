@@ -3,96 +3,94 @@ const { gql } = require('graphql-request')
 const client = require('./gql-client')
 const simplifyVideoData = require('./simplify-video-data')
 
-module.exports = async function getCreatorProfile (username) {
-  const query = gql`
-  query ($username: String!) {
-    user(where: {username: $username}) {
-      id
-      username
-      state
-      fullName
-      pinnedPost {
-        id
-        status
-        vimeoUri
-        vimeoId
-        published
-        postPictures {
-          id
-          uri
-          width
-          height
-          __typename
-        }
-        currentTotalViewCount
-        __typename
-      }
-      createdPosts {
-        ...Video
-        __typename
-      }
-      __typename
-    }
-  }
-
-  fragment Video on Post {
+const query = gql`query ($username: String!) {
+  user(where: {username: $username}) {
     id
-    vimeoId
-    gloss
-    published
-    status
-    phrase {
+    username
+    state
+    fullName
+    pinnedPost {
       id
-      color
-      friendlyPhrase
-      posts {
+      status
+      vimeoUri
+      vimeoId
+      published
+      postPictures {
         id
-        published
-        vimeoId
-        gloss
-        author {
-          id
-          username
-          __typename
-        }
-        status
+        uri
+        width
+        height
         __typename
       }
-      topics {
-        id
-        topic {
-          id
-          friendlyName
-          color
-          __typename
-        }
-        __typename
-      }
+      currentTotalViewCount
       __typename
     }
-    notes
-    author {
-      id
-      username
-      fullName
+    createdPosts {
+      ...Video
       __typename
     }
-    postPictures {
-      id
-      uri
-      width
-      height
-      __typename
-    }
-    currentTotalViewCount
     __typename
   }
-  `
+}
+
+fragment Video on Post {
+  id
+  vimeoId
+  gloss
+  published
+  status
+  phrase {
+    id
+    color
+    friendlyPhrase
+    posts {
+      id
+      published
+      vimeoId
+      gloss
+      author {
+        id
+        username
+        __typename
+      }
+      status
+      __typename
+    }
+    topics {
+      id
+      topic {
+        id
+        friendlyName
+        color
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  notes
+  author {
+    id
+    username
+    fullName
+    __typename
+  }
+  postPictures {
+    id
+    uri
+    width
+    height
+    __typename
+  }
+  currentTotalViewCount
+  __typename
+}`
+
+module.exports = async function getCreatorProfile (username) {
   const variables = { username }
   const reqHeaders = { referer: uri`https://www.auslananywhere.com.au/creators/${username}` }
 
   const data = await client.request(query, variables, reqHeaders)
-  console.log(JSON.stringify(data, undefined, 2))
 
   const profile = {
     username,

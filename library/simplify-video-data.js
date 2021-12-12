@@ -8,7 +8,7 @@ module.exports = function simplifyVideoData (post) {
     url: uri`https://vimeo.com/${post.vimeoId}`,
     vimeoID: post.vimeoId,
     gloss: post.gloss,
-    picture: post.postPictures.sort((a, b) => a.height - b.height)[0],
+    picture: post.postPictures.sort((a, b) => b.height - a.height)[0].uri,
     viewCount: post.currentTotalViewCount,
     notes: post.notes
   }
