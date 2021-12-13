@@ -26,6 +26,7 @@ async function * transform (input) {
     for (const post of posts) {
       const { id, url: vimeoURL, gloss, notes, title } = post
       yield {
+        id: `${id}`,
         title,
         link: uri`https://www.auslananywhere.com.au/feed/${id}`,
         nav: [
