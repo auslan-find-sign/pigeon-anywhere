@@ -17,7 +17,7 @@ const { argv } = yargs(hideBin(process.argv))
     alias: 'o',
     type: 'string',
     default: '-',
-    description: 'filename to output yaml stream, or - for stdout'
+    description: 'filename to output json stream, or - for stdout'
   })
 
 async function * transform (input) {
@@ -60,10 +60,15 @@ async function * decodeYamlDocs (iter) {
 }
 
 // streaming yaml document encoder
-async function * encodeYamlDocs (iterator) {
+async function * encodeJsonDocs (iterator) {
+  yield '['
+  let first = true
   for await (const entry of iterator) {
-    yield yaml.stringify(entry) + '...\n'
+    if (!first) yield ','
+    first = false
+    yield JSON.stringify(entry) + ''
   }
+  yield ']'
 }
 
 async function run () {
@@ -71,7 +76,7 @@ async function run () {
     argv.input === '-' ? process.stdin : fs.createReadStream(argv.input),
     decodeYamlDocs,
     transform,
-    encodeYamlDocs,
+    encodeJsonDocs,
     argv.output === '-' ? process.stdout : fs.createWriteStream(argv.output)
   )
 }

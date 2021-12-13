@@ -104,3 +104,4 @@ dist
 .tern-port
 *.yaml
 .DS_Store
+*.json
