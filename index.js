@@ -3,6 +3,7 @@ const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
 const getCreators = require('./library/get-creators')
 const getCreatorProfile = require('./library/get-creator-profile')
+const introspectServer = require('./library/introspect-server')
 const fetch = require('node-fetch').default
 const fs = require('fs')
 const { Readable } = require('stream')
@@ -18,6 +19,10 @@ const { argv } = yargs(hideBin(process.argv))
     alias: 'a',
     type: 'boolean',
     description: 'Grab all the creator profiles'
+  })
+  .option('introspect', {
+    type: 'boolean',
+    description: 'attempt to introspect GQL structure on AuslanAnywhere server'
   })
   .option('output', {
     alias: 'o',
@@ -49,6 +54,11 @@ async function * yamlStream (iterator) {
 async function run () {
   if (argv.profile && argv['all-creators']) {
     throw new Error('cannot use --profile and --all-creators together')
+  }
+
+  if (argv.introspect) {
+    await introspectServer()
+    return
   }
 
   const stream = Readable.from(await yamlStream(await dataIter()))
