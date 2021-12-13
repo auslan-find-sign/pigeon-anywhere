@@ -13,6 +13,9 @@ module.exports = function simplifyVideoData (post) {
     notes: post.notes
   }
 
+  if (post.createdAt) output.createdAt = post.createdAt
+  if (post.updatedAt) output.updatedAt = post.updatedAt
+
   if (post.gloss) output.gloss = post.gloss
   if (Array.isArray(post.topics)) {
     output.topics = post.topics.map(x => x.topic.friendlyName)

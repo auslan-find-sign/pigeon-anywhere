@@ -39,6 +39,8 @@ fragment Video on Post {
   gloss
   published
   status
+  createdAt
+  updatedAt
   phrase {
     id
     color
