@@ -35,7 +35,7 @@ async function * transform (input) {
         ],
         tags: ['auslan-anywhere', state.toLowerCase(), username],
         body: `Gloss: ${gloss}\n${notes}`,
-        media: [{ method: 'youtube-dl', url: vimeoURL }],
+        videos: [{ method: 'youtube-dl', url: vimeoURL }],
         timestamp: Date.parse(post.createdAt)
       }
     }
