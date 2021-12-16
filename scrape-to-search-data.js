@@ -34,6 +34,10 @@ async function * transform (input) {
           [author, uri`https://www.auslananywhere.com.au/creators/${username}`],
           [title, uri`https://www.auslananywhere.com.au/feed/${id}`]
         ],
+        author: {
+          name: author,
+          url: uri`https://www.auslananywhere.com.au/creators/${username}`
+        },
         tags: ['auslan-anywhere', state.toLowerCase(), username],
         body: `Gloss: ${gloss}\n${notes}`,
         media: [{ method: 'youtube-dl', url: vimeoURL }],
