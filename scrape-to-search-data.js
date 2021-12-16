@@ -36,7 +36,7 @@ async function * transform (input) {
         ],
         author: {
           name: author,
-          url: uri`https://www.auslananywhere.com.au/creators/${username}`
+          link: uri`https://www.auslananywhere.com.au/creators/${username}`
         },
         tags: ['auslan-anywhere', state.toLowerCase(), username],
         body: `Gloss: ${gloss}\n${notes}`,
