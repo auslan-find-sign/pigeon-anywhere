@@ -2,9 +2,14 @@
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
 const fs = require('fs')
+const fsp = require('fs/promises')
+const path = require('path')
 const { pipeline } = require('stream/promises')
 const yaml = require('yaml')
 const uri = require('uri-tag').default
+const youtubedl = require('youtube-dl-exec')
+
+const knownVideos = new Set()
 
 const { argv } = yargs(hideBin(process.argv))
   .option('input', {
@@ -13,6 +18,11 @@ const { argv } = yargs(hideBin(process.argv))
     default: '-',
     description: 'filename to input yaml stream, or - for stdin'
   })
+  .option('video-folder', {
+    type: 'string',
+    default: 'videos',
+    description: 'path, relative to output, where videos should be written'
+  })
   .option('output', {
     alias: 'o',
     type: 'string',
@@ -20,28 +30,44 @@ const { argv } = yargs(hideBin(process.argv))
     description: 'filename to output json stream, or - for stdout'
   })
 
-async function * transform (input) {
-  for await (const profile of input) {
-    const { username, state, author, posts } = profile.data
-    for (const post of posts) {
-      const { id, url: vimeoURL, gloss, notes, title } = post
-      yield {
-        id: `${id}`,
-        title,
-        link: uri`https://www.auslananywhere.com.au/feed/${id}`,
-        nav: [
-          ['Auslan Anywhere', 'https://www.auslananywhere.com.au/'],
-          [author, uri`https://www.auslananywhere.com.au/creators/${username}`],
-          [title, uri`https://www.auslananywhere.com.au/feed/${id}`]
-        ],
-        author: {
-          name: author,
-          link: uri`https://www.auslananywhere.com.au/creators/${username}`
-        },
-        tags: ['auslan-anywhere', state.toLowerCase(), username],
-        body: `Gloss: ${gloss}\n${notes}`,
-        media: [{ method: 'youtube-dl', url: vimeoURL }],
-        timestamp: Date.parse(post.createdAt)
+function transform (videoFolder) {
+  return async function * transform (input) {
+    for await (const profile of input) {
+      const { username, state, author, posts } = profile.data
+      for (const post of posts) {
+        const { id, url: vimeoURL, gloss, notes, title } = post
+
+        const videoFilename = `${id}.mp4`
+        const videoPath = `${videoFolder}/${videoFilename}`
+        knownVideos.add(videoFilename)
+        if (!fs.existsSync(videoPath)) {
+          console.info('downloading', vimeoURL, `for #${id} by ${username}`)
+          const ytdlRes = await youtubedl(vimeoURL, {
+            noCheckCertificate: true,
+            output: videoPath,
+            format: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
+            referer: uri`https://www.auslananywhere.com.au/feed/${id}`
+          })
+        }
+
+        yield {
+          id: `${id}`,
+          title,
+          link: uri`https://www.auslananywhere.com.au/feed/${id}`,
+          nav: [
+            ['Auslan Anywhere', 'https://www.auslananywhere.com.au/'],
+            [author, uri`https://www.auslananywhere.com.au/creators/${username}`],
+            [title, uri`https://www.auslananywhere.com.au/feed/${id}`]
+          ],
+          author: {
+            name: author,
+            link: uri`https://www.auslananywhere.com.au/creators/${username}`
+          },
+          tags: ['auslan-anywhere', state.toLowerCase(), username],
+          body: `Gloss: ${gloss}\n${notes}`,
+          media: [{ method: 'fetch', url: videoPath}],
+          timestamp: Date.parse(post.createdAt)
+        }
       }
     }
   }
@@ -77,13 +103,23 @@ async function * encodeJsonDocs (iterator) {
 }
 
 async function run () {
+  await fsp.mkdir(argv.videoFolder, { recursive: true })
+
   await pipeline(
     argv.input === '-' ? process.stdin : fs.createReadStream(argv.input),
     decodeYamlDocs,
-    transform,
+    transform(argv.videoFolder),
     encodeJsonDocs,
     argv.output === '-' ? process.stdout : fs.createWriteStream(argv.output)
   )
+
+  // cleanup orphaned mp4's
+  const filenames = await fsp.readdir(argv.videoFolder)
+  for (const filename of filenames) {
+    if (!knownVideos.has(filename)) {
+      await fsp.rm(path.join(argv.videoFolder, filename))
+    }
+  }
 }
 
 run()
