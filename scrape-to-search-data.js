@@ -50,8 +50,7 @@ function transform (videoFolder) {
           })
         }
 
-        yield {
-          id: `${id}`,
+        yield [`${id}`, {
           title,
           link: uri`https://www.auslananywhere.com.au/feed/${id}`,
           nav: [
@@ -66,8 +65,14 @@ function transform (videoFolder) {
           tags: ['auslan-anywhere', state.toLowerCase(), username],
           body: `Gloss: ${gloss}\n${notes}`,
           media: [{ method: 'fetch', url: videoPath}],
-          timestamp: Date.parse(post.createdAt)
-        }
+          timestamp: Date.parse(post.createdAt),
+          publisher: {
+            id: 'auslan-anywhere',
+            name: 'Auslan Anywhere',
+            link: 'https://www.auslananywhere.com.au/',
+            verb: 'shared'
+          }
+        }]
       }
     }
   }
@@ -92,14 +97,14 @@ async function * decodeYamlDocs (iter) {
 
 // streaming yaml document encoder
 async function * encodeJsonDocs (iterator) {
-  yield '['
+  yield '{'
   let first = true
-  for await (const entry of iterator) {
+  for await (const [id, entry] of iterator) {
     if (!first) yield ','
     first = false
-    yield JSON.stringify(entry) + ''
+    yield JSON.stringify(`${id}`) + ':' + JSON.stringify(entry) + ''
   }
-  yield ']'
+  yield '}'
 }
 
 async function run () {
