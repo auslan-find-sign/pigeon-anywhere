@@ -59,6 +59,7 @@ function transform (videoFolder) {
             [title, uri`https://www.auslananywhere.com.au/feed/${id}`]
           ],
           author: {
+            id: username,
             name: author,
             link: uri`https://www.auslananywhere.com.au/creators/${username}`
           },
@@ -66,7 +67,7 @@ function transform (videoFolder) {
           body: `Gloss: ${gloss}\n${notes}`,
           media: [{ method: 'fetch', url: videoPath}],
           timestamp: Date.parse(post.createdAt),
-          publisher: {
+          provider: {
             id: 'auslan-anywhere',
             name: 'Auslan Anywhere',
             link: 'https://www.auslananywhere.com.au/',
