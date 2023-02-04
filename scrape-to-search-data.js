@@ -45,7 +45,7 @@ function transform (videoFolder) {
           const ytdlRes = await youtubedl(vimeoURL, {
             noCheckCertificate: true,
             output: videoPath,
-            format: 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
+            format: 'bestvideo[ext=mp4]/mp4',
             referer: uri`https://www.auslananywhere.com.au/feed/${id}`
           })
         }
