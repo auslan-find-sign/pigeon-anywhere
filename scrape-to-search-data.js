@@ -65,7 +65,10 @@ function transform (videoFolder) {
           },
           tags: ['auslan-anywhere', state.toLowerCase(), username],
           body: `Gloss: ${gloss}\n${notes}`,
-          media: [{ method: 'fetch', url: path.relative(argv.output, videoPath)}],
+          media: [{
+            method: 'fetch',
+            url: path.relative(path.dirname(argv.output), videoPath)
+          }],
           timestamp: Date.parse(post.createdAt),
           provider: {
             id: 'auslan-anywhere',
